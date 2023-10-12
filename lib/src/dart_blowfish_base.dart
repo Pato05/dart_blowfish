@@ -12,14 +12,21 @@ class Blowfish {
   late List<int> p;
   late List<List<int>> s;
 
-  Blowfish({required String key, required this.mode, required this.padding}) {
+  Blowfish(
+      {required Uint8List key, required this.mode, required this.padding}) {
     p = List<int>.from(Blocks.P);
-    s = [List<int>.from(Blocks.S0), List<int>.from(Blocks.S1), List<int>.from(Blocks.S2), List<int>.from(Blocks.S3)];
+    s = [
+      List<int>.from(Blocks.S0),
+      List<int>.from(Blocks.S1),
+      List<int>.from(Blocks.S2),
+      List<int>.from(Blocks.S3)
+    ];
 
-    Uint8List nKey = Helpers.expandKey(Encoding.stringToU8(key));
+    Uint8List nKey = Helpers.expandKey(key);
 
     for (int i = 0, j = 0; i < 18; i++, j += 4) {
-      final n = Helpers.packFourBytes(nKey[j], nKey[j + 1], nKey[j + 2], nKey[j + 3]);
+      final n =
+          Helpers.packFourBytes(nKey[j], nKey[j + 1], nKey[j + 2], nKey[j + 3]);
       p[i] = Helpers.xor(p[i], n);
     }
 
@@ -92,7 +99,8 @@ class Blowfish {
 
   dynamic decode(data, {Type returnType = Type.string}) {
     if (!Helpers.isStringOrBuffer(data)) {
-      throw Exception('Decode data should be a string or an ArrayBuffer / Buffer');
+      throw Exception(
+          'Decode data should be a string or an ArrayBuffer / Buffer');
     }
     if (mode != Mode.ecb && iv == null) {
       throw Exception('IV is not set');
@@ -139,8 +147,10 @@ class Blowfish {
     int prevL = Helpers.packFourBytes(iv![0], iv![1], iv![2], iv![3]);
     int prevR = Helpers.packFourBytes(iv![4], iv![5], iv![6], iv![7]);
     for (int i = 0; i < bytes.length; i += 8) {
-      int l = Helpers.packFourBytes(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
-      int r = Helpers.packFourBytes(bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
+      int l = Helpers.packFourBytes(
+          bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+      int r = Helpers.packFourBytes(
+          bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
       List<int> temp = [Helpers.xor(prevL, l), Helpers.xor(prevR, r)];
       l = temp[0];
       r = temp[1];
@@ -156,8 +166,10 @@ class Blowfish {
   Uint8List _encodeECB(Uint8List bytes) {
     Uint8List encoded = Uint8List(bytes.length);
     for (int i = 0; i < bytes.length; i += 8) {
-      int l = Helpers.packFourBytes(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
-      int r = Helpers.packFourBytes(bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
+      int l = Helpers.packFourBytes(
+          bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+      int r = Helpers.packFourBytes(
+          bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
       List<int> result = _encryptBlock(l, r);
       l = result[0];
       r = result[1];
@@ -186,8 +198,10 @@ class Blowfish {
   Uint8List _decodeECB(Uint8List bytes) {
     final decoded = Uint8List(bytes.length);
     for (var i = 0; i < bytes.length; i += 8) {
-      final l = Helpers.packFourBytes(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
-      final r = Helpers.packFourBytes(bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
+      final l = Helpers.packFourBytes(
+          bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+      final r = Helpers.packFourBytes(
+          bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
       final decrypted = _decryptBlock(l, r);
       decoded.setRange(i, i + 4, Helpers.unpackFourBytes(decrypted[0]));
       decoded.setRange(i + 4, i + 8, Helpers.unpackFourBytes(decrypted[1]));
@@ -201,8 +215,10 @@ class Blowfish {
     var prevR = Helpers.packFourBytes(iv![4], iv![5], iv![6], iv![7]);
     int prevLTmp, prevRTmp;
     for (var i = 0; i < bytes.length; i += 8) {
-      final l = Helpers.packFourBytes(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
-      final r = Helpers.packFourBytes(bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
+      final l = Helpers.packFourBytes(
+          bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+      final r = Helpers.packFourBytes(
+          bytes[i + 4], bytes[i + 5], bytes[i + 6], bytes[i + 7]);
       prevLTmp = l;
       prevRTmp = r;
       final decrypted = _decryptBlock(l, r);

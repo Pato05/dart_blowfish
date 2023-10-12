@@ -2,9 +2,11 @@ import 'dart:typed_data';
 
 import 'package:dart_blowfish/src/constants.dart';
 import 'package:dart_blowfish/src/dart_blowfish_base.dart';
+import 'package:dart_blowfish/src/encoding.dart';
 
 void main() {
-  final cipher = Blowfish(key: 'test', mode: Mode.cbc, padding: Padding.none);
+  final cipher = Blowfish(
+      key: Encoding.stringToU8('test'), mode: Mode.cbc, padding: Padding.none);
   cipher.setIv(Uint8List.fromList([0, 1, 2, 3, 4, 5, 6, 7]));
   final chunk = Uint8List.fromList([0, 1, 2, 3, 4, 5, 6, 7]);
   final decrypted = cipher.decode(chunk, returnType: Type.uInt8Array);
